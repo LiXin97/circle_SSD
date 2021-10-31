@@ -1,0 +1,11 @@
+name: circle_SSD
+channels:
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  -opencv-python
+  - numpy
+  - python
+  - pytorch
+  - pip
