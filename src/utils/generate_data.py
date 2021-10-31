@@ -18,7 +18,7 @@ def create_dataset(dataset_folder, img_num):
     rotateAngle = 0
     startAngle = 0
     endAngle = 360
-    thickness = 3
+    thickness = -1
     lineType = 8
     colors = [[0,0,255], [0,255,0], [255,0,0]]
 
@@ -36,19 +36,19 @@ def create_dataset(dataset_folder, img_num):
         center_y = random.randint(50, 200) #random.random() * 256
         ptCenter = (center_x, center_y)
 
-        radius = random.randint(30, 150) #random.random() * 256
-        ratio =  round( random.random(), 2)
+        radius = random.randint(30, 80) #random.random() * 256
+        ratio =  round( random.random(), 2) / 0.5 + 0.25
 
         axesSize = (radius, int(radius*ratio))
-        label = 1#random.randint(0, 2)
+        label = random.randint(0, 2)
         color = colors[label]
         cv.ellipse(img, ptCenter, axesSize, rotateAngle, startAngle, endAngle, color, thickness, lineType)
 
         csv_file_save.append([img_save_name, label, center_x, center_y, radius, int(radius*ratio)])
 
         # cv.line(img, (center_x-radius, center_y-int(radius*ratio)), (center_x+radius, center_y+int(radius*ratio)), (0, 255, 0), thickness=thickness)
-        # cv.imshow('img', img)
-        # cv.waitKey()
+        cv.imshow('img', img)
+        cv.waitKey()
         cv.imwrite( os.path.join(img_floder, img_save_name), img )
 
     with open(csv_file_name, mode='w') as csv_file:
@@ -65,4 +65,4 @@ def create_dataset(dataset_folder, img_num):
                              'radius_y': line[5]})
 
 if __name__ == '__main__':
-    create_dataset('../data/circle_train', 100)
+    create_dataset('../../data/circle_train', 50)

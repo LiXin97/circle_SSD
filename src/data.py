@@ -20,7 +20,11 @@ def read_data_my(data_dir, is_train=True):
         targets.append(list(target))
     targets = torch.tensor(targets).unsqueeze(1)
     # targets[:, :, 1:] = targets[:, :, 1:] / 256.
-    return images, targets / 256.
+    targets = targets.float()
+    targets[:, :, 1:] = targets[:, :, 1:].float() / 256.
+    # targets[:, :, 1:] = torch.div(targets[:, :, 1:].float(), 0.137)
+
+    return images, targets
 
 class MyDataset(torch.utils.data.Dataset):
     """A customized dataset to load the banana detection dataset."""

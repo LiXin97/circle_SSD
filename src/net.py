@@ -8,7 +8,7 @@ ratios = [[1, 2, 0.5]] * 5
 num_anchors = len(radiuses[0]) + len(ratios[0]) - 1
 
 cls_loss = nn.CrossEntropyLoss(reduction='none')
-bbox_loss = nn.L1Loss(reduction='none')
+bbox_loss = nn.SmoothL1Loss(reduction='none')
 
 def cls_predictor(num_inputs, num_anchors, num_classes):
     return nn.Conv2d(num_inputs, num_anchors * (num_classes + 1),

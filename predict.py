@@ -1,13 +1,14 @@
 import cv2.cv2 as cv
+import argparse
 
 from src.net import *
 from src.data import MyDataset
 from src.utils.utils import *
 from torch.nn import functional as F
 
-model_path = 'model/0.pth'
 device = try_gpu()
-img_path = 'data/circle_train/images/0.png'
+# model_path = 'model/0.pth'
+# img_path = 'data/circle_train/images/0.png'
 
 def offset_inverse(anchors, offset_preds):
     """Predict bounding boxes based on anchor boxes with predicted offsets."""
@@ -63,7 +64,7 @@ def multicircle_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         out.append(pred_info)
     return torch.stack(out)
 
-def predit():
+def predit(model_path, img_path):
     net = torch.load( model_path )
     X = torchvision.io.read_image(img_path).unsqueeze(0).float()
     net.eval()
@@ -74,15 +75,15 @@ def predit():
     idx = [i for i, row in enumerate(output[0]) if row[0] != -1]
     predit_output = output[0, idx]
 
-    threshold = 0.3
+    threshold = 0.1
     rotateAngle = 0
     startAngle = 0
     endAngle = 360
     thickness = 3
-    lineType = 8
+    lineType = 1
     colors = [[0,0,255], [0,255,0], [255,0,0]]
 
-    img = np.ones((256, 256, 3), np.uint8)
+    img = np.ones((256, 256, 3), np.uint8) * 255
     for row in predit_output:
         score = float(row[1])
         if score < threshold:
@@ -90,9 +91,16 @@ def predit():
 
         ptCenter = (int(row[2]*256), int(row[3]*256))
         axesSize = (int(row[4]*256), int(row[5]*256))
-        cv.ellipse(img, ptCenter, axesSize, rotateAngle, startAngle, endAngle, colors[0], thickness, lineType)
+        cv.ellipse(img, ptCenter, axesSize, rotateAngle, startAngle, endAngle, colors[int(row[0])], thickness, lineType)
     cv.imshow('img', img)
     cv.waitKey()
 
 if __name__ == '__main__':
-    predit()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--model_path",
+                        help="path to saved model", type=str, required=True)
+    parser.add_argument("-t", "--test_img_path",
+                        help="path to test img", type=str, required=True)
+    args = parser.parse_args()
+
+    predit(args.model_path, args.test_img_path)
